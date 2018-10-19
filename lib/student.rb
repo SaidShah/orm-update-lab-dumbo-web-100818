@@ -31,12 +31,13 @@ attr_accessor :id, :name, :grade
   end
 
   def save
-    sql = <<-SQL
-      INSERT INTO students (name, grade) VALUES (?, ?)
-    SQL
 
-    DB[:conn].execute(sql,self.name,self.grade)
-    @id = DB[:conn].execute("SELECT last_insert_rowid() FROM students")[0][0]
+      sql = <<-SQL
+        INSERT INTO students (name, grade) VALUES (?, ?)
+        SQL
+        DB[:conn].execute(sql,self.name,self.grade)
+        @id = DB[:conn].execute("SELECT last_insert_rowid() FROM students")[0][0]
+
   end
 
   def self.create(name, grade)
@@ -49,9 +50,20 @@ attr_accessor :id, :name, :grade
     Student.new(given_value[0],given_value[1],given_value[2])
   end
 
+  def self.find_by_name(name)
+    sql = <<-SQL
+      SELECT * FROM students WHERE name = ?
+    SQL
+    result = DB[:conn].execute(sql,name)[0]
+    Student.new(result[0],result[1],result[2])
+  end
 
-
-
+  def update
+      sql = <<-SQL
+        UPDATE students SET id = ?, name = ?, grade = ?
+      SQL
+      DB[:conn].execute(sql,self.id, self.name, self.grade)
+  end
 
 
 
